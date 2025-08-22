@@ -8,10 +8,12 @@ WORKDIR /app
 COPY package.json yarn.lock* pnpm-lock.yaml* ./
 COPY tsconfig.json tsconfig.*json ./
 
+# Install dependencies using pnpm
+RUN corepack enable pnpm && pnpm install --frozen-lockfile
 # Choose your package manager. Uncomment the one you use.
 # RUN npm install
 # RUN yarn install --frozen-lockfile
-RUN pnpm install --frozen-lockfile
+#RUN pnpm install --frozen-lockfile
 
 # Copy the rest of your application code
 COPY . .
@@ -28,7 +30,9 @@ WORKDIR /app
 # Copy only the necessary files from the builder stage
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/.tanstack-start/dist ./dist
+COPY --from=builder /app/.output ./
+
+
 
 # Expose the port your Tanstack Start app listens on.
 # By default, Tanstack Start apps run on port 3000 in production.
@@ -37,4 +41,4 @@ EXPOSE 3000
 # Set the command to run your Tanstack Start application
 # This typically starts the production server.
 # Replace 'pnpm start' with 'npm start' or 'yarn start' if you use those.
-CMD ["pnpm", "start"]
+CMD ["node", "server/index.mjs"]

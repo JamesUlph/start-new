@@ -3,6 +3,7 @@ import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/signin')({
   loader: async () => {
+    console.log('SIGIN');
     let { href } = await getAuthUrl();
 
     // console.log(u.url.href);

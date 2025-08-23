@@ -17,7 +17,7 @@ RUN corepack enable pnpm && pnpm install --frozen-lockfile
 
 # Copy the rest of your application code
 COPY . .
-
+ENV NODE_ENV=production
 # Build the Tanstack Start application
 # Replace 'pnpm build' with 'npm run build' or 'yarn build' if you use those.
 RUN pnpm build

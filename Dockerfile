@@ -32,7 +32,9 @@ WORKDIR /app
 #COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.output ./
 
-
+# set environment variables
+ENV NODE_ENV=production
+ENV PORT=3000
 
 # Expose the port your Tanstack Start app listens on.
 # By default, Tanstack Start apps run on port 3000 in production.

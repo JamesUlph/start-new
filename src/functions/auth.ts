@@ -7,9 +7,10 @@ import * as arctic from 'arctic';
 const domain = 'dev-neomainf-domain.auth.eu-west-2.amazoncognito.com';
 const clientId = '2fqgd4551sr9q22io1b50acgec';
 const clientSecret = 'c62fsikflj6jt0ntoac7dl7p4aq6b1uhjlisleqghlii1d1d73l';
-const redirectURI = process.env['production']
-  ? 'https://start-new.ballistix.co.uk/api/auth/callback/cognito'
-  : 'http://localhost:3000/api/auth/callback/cognito';
+const redirectURI =
+  process.env['NODE_ENV'] == 'production'
+    ? 'https://start-new.ballistix.co.uk/api/auth/callback/cognito'
+    : 'http://localhost:3000/api/auth/callback/cognito';
 
 //export const codeVerifier = arctic.generateCodeVerifier();
 //console.log({ codeVerifier });

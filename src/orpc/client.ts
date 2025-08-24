@@ -13,6 +13,7 @@ const getORPCClient = createIsomorphicFn()
   .server(() =>
     createRouterClient(router, {
       context: () => ({
+        //db: prisma,
         headers: getHeaders(),
       }),
     })

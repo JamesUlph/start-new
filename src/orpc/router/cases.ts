@@ -1,6 +1,7 @@
 import { dev, pub } from '@/orpc';
 import { CaseData, GeneratedDocument } from '@/types/generated-document';
 import { z } from 'zod';
+import { prisma } from '@/lib/db';
 
 // Define a Zod schema for CaseData for runtime validation
 const CaseDataSchema = z.object({
@@ -14,6 +15,20 @@ export const getCase = pub
 
   .handler(async ({ input, context }) => {
     try {
+      //console.log(context.db);
+
+      console.log('PRISMA-------');
+
+      let cases = await prisma.case.findMany({
+        where: { CaseNumber: input.caseNumber },
+        include: {
+          CaseType: true,
+          Consultation: { include: { generatedDocuments: true } },
+        },
+      });
+
+      console.log(JSON.stringify(cases, null, 2));
+
       const resp = await fetch(
         'https://devtoken.neoma.co.uk/CaseV3/case/GetCaseData',
         {

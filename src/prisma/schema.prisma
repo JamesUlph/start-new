@@ -1,0 +1,231 @@
+datasource db {
+  url      = env("DATABASE_URL")
+  provider = "postgresql"
+  //provider = "sqlserver"
+  // "postgresql" // "sqlserver"
+}
+
+generator client {
+  provider = "prisma-client"
+  //"prisma-client" //"prisma-client-js"
+
+  //provider        = "prisma-client" //"prisma-client" //"prisma-client-js"
+  //previewFeatures = ["queryCompiler", "driverAdapters"]
+  previewFeatures = ["queryCompiler", "driverAdapters"]
+  //previewFeatures = ["driverAdapters"]
+  // testing 
+  output          = "../generated/prisma"
+  runtime         = "node"
+  moduleFormat    = "esm"
+}
+
+// model User {
+//     id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+//     createdAt DateTime @default(now())
+//     email     String   @unique
+//     name      String?
+// }
+
+model Post {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title     String
+  createdAt DateTime @default(now())
+}
+
+model Template {
+  id          String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  description String?
+  createdAt   DateTime             @default(now())
+  definitions TemplateDefinition[]
+
+  TemplateLink       TemplateLink[] @relation("TemplateToTemplateLink")
+  LinkedTemplateLink TemplateLink[] @relation("LinkedTemplateToTemplateLink")
+}
+
+model TemplateDefinition {
+  id               String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  templateId       String  @db.Uuid // @db.Uuid
+  name             String  @default("")
+  description      String?
+  domain           String?
+  templateHTML     String?
+  templateFieldSet String?
+  fieldSet         String?
+  fieldProperties  String?
+
+  version   Int      @default(1)
+  createdAt DateTime @default(now())
+  template  Template @relation(fields: [templateId], references: [id])
+}
+
+model Case {
+  CaseId       String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  Description  String         @default("")
+  CaseNumber   Int            @default(autoincrement())
+  Status       String         @default("Open")
+  CaseTypeId   String         @db.Uuid
+  CaseType     CaseType       @relation(fields: [CaseTypeId], references: [CaseTypeId])
+  CreatedAt    DateTime       @default(now())
+  DocumentLink DocumentLink[]
+
+  Consultation Consultation[]
+}
+
+model CaseType {
+  CaseTypeId  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  Case        Case[]
+  Description String   @default("")
+  CreatedAt   DateTime @default(now())
+}
+
+model Document {
+  DocumentId      String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ReferenceNumber String         @default("")
+  Description     String         @default("")
+  CreatedAt       DateTime       @default(now())
+  DocumentLink    DocumentLink[]
+}
+
+model DocumentLink {
+  DocumentLinkId String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  DocumentId     String   @db.Uuid
+  Document       Document @relation(fields: [DocumentId], references: [DocumentId])
+  CaseId         String   @db.Uuid
+  Case           Case     @relation(fields: [CaseId], references: [CaseId])
+  CreatedAt      DateTime @default(now())
+}
+
+// create a templatelink to join templates and template definitions
+
+model TemplateLink {
+  id       String   @db.Uuid
+  // id       String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  Template Template @relation("TemplateToTemplateLink", fields: [id], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  linkedTemplateId String   @db.Uuid
+  linkedTemplate   Template @relation("LinkedTemplateToTemplateLink", fields: [linkedTemplateId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  order            Int      @default(0)
+  createdAt        DateTime @default(now())
+
+  @@id([id, linkedTemplateId])
+}
+
+model Consultation {
+  ConsultationId           String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  IsDraft                  Boolean              @default(true)
+  IsLocked                 Boolean              @default(false)
+  ResponseDueWithin        Int                  @default(7) // days
+  CaseId                   String               @db.Uuid
+  Case                     Case                 @relation(fields: [CaseId], references: [CaseId])
+  BucketKey                String               @default("")
+  FileName                 String               @default("")
+  SentDateTime             DateTime?
+  ResponseReceivedDateTime DateTime?
+  CreatedAt                DateTime             @default(now())
+  generatedDocuments       GeneratedDocuments[] // Added relation to GeneratedDocuments
+}
+
+model GeneratedDocuments {
+  GeneratedDocumentId     String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ParentId                String                 @db.Uuid
+  consultation            Consultation           @relation(fields: [ParentId], references: [ConsultationId]) // Added relation to Consultation
+  GeneratedDocumentTypeId String                 @db.Uuid
+  GeneratedDocumentType   GeneratedDocumentTypes @relation(fields: [GeneratedDocumentTypeId], references: [GeneratedDocumentTypeId])
+  PublishedAt             DateTime?
+  Title                   String                 @default("")
+  FileName                String                 @default("")
+  Bucket                  String                 @default("")
+  UserFields              String                 @db.VarChar(1024) // JSON string for user-defined fields
+  Key                     String                 @default("")
+  Type                    String                 @default("")
+  CreatedAt               DateTime               @default(now())
+
+  GeneratedDocumentFields GeneratedDocumentFields[]
+}
+
+model GeneratedDocumentFields {
+  GeneratedDocumentFieldId String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  // add link to GeneratedDocuments
+  GeneratedDocumentId      String             @db.Uuid
+  GeneratedDocument        GeneratedDocuments @relation(fields: [GeneratedDocumentId], references: [GeneratedDocumentId])
+  FieldName                String             @default("")
+  FieldType                String             @default("") // e.g., text, number, date, etc.
+  FieldDescription         String             @default("")
+  FieldRequired            Boolean            @default(false)
+  FieldOptions             String             @default("") // JSON string for options if applicable
+  FieldPlaceholder         String             @default("")
+  FieldValue               String             @default("")
+  FieldSource              String             @default("") // e.g., user, system, etc.
+  CreatedAt                DateTime           @default(now())
+
+  @@unique([GeneratedDocumentId, FieldName]) // Ensure unique field names per document
+}
+
+model GeneratedDocumentTypes {
+  GeneratedDocumentTypeId String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  Type                    String               @default("")
+  Description             String               @default("")
+  CreatedAt               DateTime             @default(now())
+  GeneratedDocuments      GeneratedDocuments[]
+}
+
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean
+  image         String?
+  createdAt     DateTime
+  updatedAt     DateTime
+  sessions      Session[]
+  accounts      Account[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
+}

@@ -18,7 +18,7 @@ import { ConfirmButton } from '@/components/confirm-button';
 const pageSchema = z.object({
   caseNumber: z.number().min(200000).default(2000000),
 });
-export const Route = createFileRoute('/case')({
+export const Route = createFileRoute('/case/')({
   validateSearch: pageSchema,
   beforeLoad: async () => {
     console.log('Before loading /case route');
@@ -78,50 +78,58 @@ function RouteComponent() {
         Refresh
       </Button>
       <div className="bg-indigo-300">{JSON.stringify(q)}</div>
-      {q.data?.map((doc) => (
-        <div key={doc.generatedDocumentId}>
-          {doc.title}
-          {doc.isPublished ? ' (Published)' : ' (Draft)'}
-          {doc.url && (
-            <Button
-              variant={'link'}
-              className="text-gray-500"
-              onClick={() => window.open(doc.url)}
-            >
-              {' '}
-              <LucideDownload />
-            </Button>
-          )}
-          <ConfirmButton
-            type="Publish"
-            dialog={{
-              title: 'Publish Document',
-              description:
-                'This action will publish this document so it is available to use in other areas of the application.',
-            }}
-            confirmText="Yes, publish"
-            onConfirm={() => {
-              alert('x');
-              //onCommand &&
-              //onCommand({ type: 'PUBLISH', id: doc.GeneratedDocumentId })
-            }}
-          />{' '}
-          <ConfirmButton
-            type="Delete"
-            dialog={{
-              title: 'Delete',
-              description:
-                'This action will publish this document so it is available to use in other areas of the application.',
-            }}
-            confirmText="Yes, publish"
-            onConfirm={() => {
-              alert('x');
-              //onCommand &&
-              //onCommand({ type: 'PUBLISH', id: doc.GeneratedDocumentId })
-            }}
-          />
-        </div>
-      ))}
+
+      <section className="grid grid-cols-4 gap-4 bg-gray-100 p-4">
+        {q.data?.map((doc: any) => (
+          <div
+            key={doc.generatedDocumentId}
+            className="bg-white p-2 rounded shadow-md"
+          >
+            {doc.title}
+            {doc.isPublished ? ' (Published)' : ' (Draft)'}
+            {doc.url && (
+              <Button
+                variant={'link'}
+                className="text-gray-500"
+                onClick={() => window.open(doc.url)}
+              >
+                {' '}
+                <LucideDownload />
+              </Button>
+            )}
+            <div className="flex gap-2 justify-end w-full p-2 bg-red-500">
+              <ConfirmButton
+                type="Publish"
+                dialog={{
+                  title: 'Publish Document',
+                  description:
+                    'This action will publish this document so it is available to use in other areas of the application.',
+                }}
+                confirmText="Yes, publish"
+                onConfirm={() => {
+                  alert('x');
+                  //onCommand &&
+                  //onCommand({ type: 'PUBLISH', id: doc.GeneratedDocumentId })
+                }}
+              />{' '}
+              <ConfirmButton
+                type="Delete"
+                dialog={{
+                  title: 'Delete',
+                  description:
+                    'This action will publish this document so it is available to use in other areas of the application.',
+                }}
+                confirmText="Yes, publish"
+                onConfirm={() => {
+                  alert('x');
+                  //onCommand &&
+                  //onCommand({ type: 'PUBLISH', id: doc.GeneratedDocumentId })
+                }}
+              />
+            </div>
+          </div>
+        ))}
+      </section>
       {JSON.stringify(caseData)}
       <label>{caseData.data.caseNumber}</label>
       <Button

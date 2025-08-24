@@ -2,8 +2,11 @@ import { os, ORPCError } from '@orpc/server';
 import { RequestHeadersPluginContext } from '@orpc/server/plugins';
 import { redirect } from '@tanstack/react-router';
 import { getCookie, sendRedirect } from '@tanstack/react-start/server';
+import { PrismaClient } from './generated/prisma/client';
 
-interface ORPCContext extends RequestHeadersPluginContext {}
+interface ORPCContext extends RequestHeadersPluginContext {
+  db?: PrismaClient;
+}
 
 const base = os.$context<ORPCContext>();
 

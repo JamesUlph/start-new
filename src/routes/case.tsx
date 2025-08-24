@@ -13,6 +13,7 @@ import {
 import { getGeneratedDocuments } from '@/functions/get-generated-documents';
 import { orpc } from '@/orpc/client';
 import { LucideDownload } from 'lucide-react';
+import { ConfirmButton } from '@/components/confirm-button';
 
 const pageSchema = z.object({
   caseNumber: z.number().min(200000).default(2000000),
@@ -64,7 +65,7 @@ function RouteComponent() {
   // const caseData = useSuspenseQuery(caseQuery(data.caseNumber));
   return (
     <div>
-      Hello "/case"!
+      <h2 className="text-lg font-semibold">Case details</h2>
       <Suspense fallback={<div>Loading...</div>}>
         <CaseDataCard caseNumber={data.caseNumber} />
       </Suspense>
@@ -91,6 +92,34 @@ function RouteComponent() {
               <LucideDownload />
             </Button>
           )}
+          <ConfirmButton
+            type="Publish"
+            dialog={{
+              title: 'Publish Document',
+              description:
+                'This action will publish this document so it is available to use in other areas of the application.',
+            }}
+            confirmText="Yes, publish"
+            onConfirm={() => {
+              alert('x');
+              //onCommand &&
+              //onCommand({ type: 'PUBLISH', id: doc.GeneratedDocumentId })
+            }}
+          />{' '}
+          <ConfirmButton
+            type="Delete"
+            dialog={{
+              title: 'Delete',
+              description:
+                'This action will publish this document so it is available to use in other areas of the application.',
+            }}
+            confirmText="Yes, publish"
+            onConfirm={() => {
+              alert('x');
+              //onCommand &&
+              //onCommand({ type: 'PUBLISH', id: doc.GeneratedDocumentId })
+            }}
+          />
         </div>
       ))}
       {JSON.stringify(caseData)}

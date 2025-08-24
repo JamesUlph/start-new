@@ -1,4 +1,10 @@
-import { Link, useNavigate } from '@tanstack/react-router';
+import {
+  Link,
+  useNavigate,
+  useParams,
+  useRouter,
+  useSearch,
+} from '@tanstack/react-router';
 import {
   SelectTrigger,
   Select,
@@ -7,10 +13,15 @@ import {
   SelectItem,
   SelectGroup,
 } from './ui/select';
+import { Route } from '@/routes';
 
 const jobs = [2000000, 2000100, 2007167, 2023490, 2023478, 2023487, 2023481];
 export default function Header() {
   let r = useNavigate();
+  const { caseNumber } = useSearch({ from: '/case', shouldThrow: false }) || {
+    caseNumber: undefined,
+  };
+
   return (
     <header className="p-2 flex gap-2 bg-white text-black justify-between">
       <nav className="flex flex-row">
@@ -35,6 +46,7 @@ export default function Header() {
         </div>
 
         <Select
+          defaultValue={caseNumber ? String(caseNumber) : ''}
           onValueChange={(e) => {
             r({ to: '/case', search: { caseNumber: Number(e) } });
           }}

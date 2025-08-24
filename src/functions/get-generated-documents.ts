@@ -1,4 +1,5 @@
 import { loggingMiddleware } from '@/middleware/logging-middleware';
+import { GeneratedDocument } from '@/types/generated-document';
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
 // base https://devtoken.neoma.co.uk/CaseV3/case/GetGeneratedDocuments
@@ -16,11 +17,8 @@ export const getGeneratedDocuments = createServerFn({
   //response: 'data',
 })
   .middleware([loggingMiddleware])
-  .validator((params: unknown) => {
-    return GetGeneratedDocumentsSchema.parse(params);
-  })
+  .validator(GetGeneratedDocumentsSchema)
   .handler(async ({ data, context }) => {
-    console.log('cock', data);
     let d = await fetch(`${BASE_URL}/case/GetGeneratedDocuments`, {
       method: 'POST',
       headers: {
@@ -30,17 +28,7 @@ export const getGeneratedDocuments = createServerFn({
       body: JSON.stringify(data),
     });
 
-    let p = (await d.json()) as {
-      generatedDocumentId: string;
-      documentType: string;
-      title: string;
-      isPublished: boolean;
-      createdBy: string;
-      createdDateTime: string;
+    let p = await d.json();
 
-      parentId: string;
-    }[];
-
-    console.log({ p });
     return p;
   });

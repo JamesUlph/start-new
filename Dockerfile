@@ -22,6 +22,9 @@ ENV NODE_ENV=production
 # Replace 'pnpm build' with 'npm run build' or 'yarn build' if you use those.
 RUN pnpm build
 
+# list the contents of the /app directory for debugging purposes
+RUN ls -la /app
+
 # Stage 2: Run the application
 FROM node:20-alpine AS runner
 
@@ -31,7 +34,7 @@ WORKDIR /app
 #COPY --from=builder /app/package.json ./
 #COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.output ./
-COPY --from=builder ./src/generated/prisma ./prisma
+#COPY --from=builder ./src/generated/prisma ./prisma
 
 
 # set environment variables

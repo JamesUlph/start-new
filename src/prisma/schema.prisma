@@ -11,12 +11,12 @@ generator client {
 
   //provider        = "prisma-client" //"prisma-client" //"prisma-client-js"
   //previewFeatures = ["queryCompiler", "driverAdapters"]
-  previewFeatures = ["queryCompiler", "driverAdapters"]
+  //previewFeatures = ["queryCompiler", "driverAdapters"]
   //previewFeatures = ["driverAdapters"]
   // testing 
-  output          = "../generated/prisma"
-  runtime         = "node"
-  moduleFormat    = "esm"
+  output       = "../generated/prisma"
+  runtime      = "nodejs"
+  moduleFormat = "esm"
 }
 
 // model User {

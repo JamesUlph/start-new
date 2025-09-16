@@ -8,7 +8,7 @@ datasource db {
 generator client {
   provider      = "prisma-client"
   //"prisma-client" //"prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-3.0.x"] // for vercel
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"] // for vercel
   //queryEngineBinaryTargets = ["native"]
   //queryEngine              = "library"
   //provider        = "prisma-client" //"prisma-client" //"prisma-client-js"

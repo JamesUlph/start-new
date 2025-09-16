@@ -23,7 +23,7 @@ ENV NODE_ENV=production
 RUN pnpm build
 
 # list the contents of the /app directory for debugging purposes
-RUN ls -la /app
+RUN ls -la /app/src/generated/prisma
 
 # Stage 2: Run the application
 FROM node:20-alpine AS runner

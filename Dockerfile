@@ -34,7 +34,7 @@ WORKDIR /app
 #COPY --from=builder /app/package.json ./
 #COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.output ./
-#COPY --from=builder ./src/generated/prisma ./prisma
+COPY --from=builder /app/src/generated/prisma ./
 
 
 # set environment variables

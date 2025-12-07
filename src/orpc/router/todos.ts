@@ -8,7 +8,8 @@ const todos = [
   { id: 3, name: 'Finish the project' },
 ];
 
-export const listTodos = pub.input(z.object({})).handler(() => {
+export const listTodos = pub.handler(() => {
+  console.log('LIST');
   return todos;
 });
 
